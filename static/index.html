@@ -22,14 +22,31 @@
           </div>
         </div>
 
-        <div class="restaurants-list">
-          <div v-for="restaurant in restaurants" class="restaurant-card">
-            <div><b>{{ restaurant.name }}</b></div>
-            <div>Cuisine: {{ restaurant.cuisine }}</div>
-            <div>{{ restaurant.address.building + ', ' + restaurant.address.street }}</div>
-            <div>{{ restaurant.borough + ', New York ' + restaurant.address.zipcode }}</div>
-            <div>United States</div>
+        <div class="content">
+
+          <div class="restaurant-facets">
+            <div class="list-facet">
+              <div><b>Cuisine:</b></div>
+              <div
+                v-for="facet in facetCusine"
+                class="facet-item"
+                :class="{selected: isFacetSelected(facet)}"
+                @click="facetClicked(facet)">
+                {{ facet.label }}
+              </div>
+            </div>
           </div>
+
+          <div class="restaurants-list">
+            <div v-for="restaurant in restaurants" class="restaurant-card">
+              <div><b>{{ restaurant.name }}</b></div>
+              <div>Cuisine: {{ restaurant.cuisine }}</div>
+              <div>{{ restaurant.address.building + ', ' + restaurant.address.street }}</div>
+              <div>{{ restaurant.borough + ', New York ' + restaurant.address.zipcode }}</div>
+              <div>United States</div>
+            </div>
+          </div>
+
         </div>
 
       </div>

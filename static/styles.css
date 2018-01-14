@@ -9,9 +9,35 @@ body {
     justify-content: space-between;
 }
 
+.content {
+    display: flex;
+}
+
+.restaurant-facets {
+    display: flex;
+    flex-direction: column;
+    min-width: 200px;
+    margin-right: 10px;
+}
+
+.facet-item {
+    cursor: pointer;
+    padding: 5px;
+}
+
+.facet-item.selected {
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+.facet-item:hover {
+    background-color: #eee;
+}
+
 .restaurants-list {
     display: flex;
     flex-wrap: wrap;
+    flex-grow: 1;
 }
 
 .restaurant-card {
