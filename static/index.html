@@ -12,6 +12,26 @@
     <script type="text/x-template" id="app">
       <div>
         <h2>Restaurants count: {{ restaurantsCount }}</h2>
+
+        <div class="restaurants-navigation">
+          <h4>NY Restaurants:</h4>
+          <div>
+            Page: {{ page }}
+            <button @click="previousPage"> <-- </button>
+            <button @click="nextPage"> --> </button>
+          </div>
+        </div>
+
+        <div class="restaurants-list">
+          <div v-for="restaurant in restaurants" class="restaurant-card">
+            <div><b>{{ restaurant.name }}</b></div>
+            <div>Cuisine: {{ restaurant.cuisine }}</div>
+            <div>{{ restaurant.address.building + ', ' + restaurant.address.street }}</div>
+            <div>{{ restaurant.borough + ', New York ' + restaurant.address.zipcode }}</div>
+            <div>United States</div>
+          </div>
+        </div>
+
       </div>
     </script>
 

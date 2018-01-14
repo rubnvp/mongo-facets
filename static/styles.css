@@ -3,3 +3,21 @@ body {
     color: #2c3e50;
     margin-top: 60px;
 }
+
+.restaurants-navigation {
+    display: flex;
+    justify-content: space-between;
+}
+
+.restaurants-list {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.restaurant-card {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    margin: 5px;
+    border: 1px solid #ccc;
+}
