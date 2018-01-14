@@ -1,12 +1,17 @@
-from flask import Flask
+from flask import Flask, jsonify
+from pymongo import MongoClient
+
 app = Flask(__name__)
+client = MongoClient('localhost:27017')
+db = client.test
 
 # API
 API_ENDPOINT = '/api'
 
-@app.route(API_ENDPOINT + "/hello")
-def hello():
-    return "Hello from Flask!"
+@app.route(API_ENDPOINT + "/restaurants/count")
+def restaurants_count():
+    restaurants_count = db.restaurants.find().count()
+    return jsonify(restaurants_count)
 
 # Statics
 @app.route('/')

@@ -8,17 +8,20 @@ var app = new Vue({
     template: '#app',
     data: function() {
         return {
-            answer: '',
+            restaurantsCount: '',
         };
     },
     methods: {
-        helloAsk: function() {
+        fetchRestaurantsCount: function() {
             var self = this;
-            axios.get(API_ENDPOINT + '/hello').then(function(response) {
-                self.answer = response.data;
+            axios.get(API_ENDPOINT + '/restaurants/count').then(function(response) {
+                self.restaurantsCount = response.data;
             });
         },
     },
+    mounted: function() {
+        this.fetchRestaurantsCount();
+    }
 });
     
 })(); 
