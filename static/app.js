@@ -11,11 +11,12 @@ var app = new Vue({
             page: 0,
             selectedFacets: {
                 cuisine: [],
+                borough: [],
             },
-            facetCusine: [
-                {label: 'American (100)', value: 'American', type: 'cuisine'},
-                {label: 'Delicatessen (100)', value: 'Delicatessen', type: 'cuisine'},
-            ],
+            facets: {
+                cuisine: [],
+                borough: [],
+            },
             restaurants: [],
             restaurantsCount: '',
         };
@@ -45,17 +46,26 @@ var app = new Vue({
             if (!facetList) return false;
             return facetList.indexOf(facet.value) !== -1;
         },
-        fetchRestaurants: function() {
+        fetchRestaurantsAndFacets: function() {
             var self = this;
             var options = {
                 params: {
                     page: this.page,
                     cuisines: this.selectedFacets.cuisine.join(','),
+                    boroughs: this.selectedFacets.borough.join(','),
                 }
             };
+
             if (!options.params.cuisines.length) delete options.params.cuisines;
-            return axios.get(API_ENDPOINT + '/restaurants/', options).then(function(response) {
+            if (!options.params.boroughs.length) delete options.params.boroughs;
+
+            axios.get(API_ENDPOINT + '/restaurants', options).then(function(response) {
                 self.restaurants = response.data;
+            });
+            axios.get(API_ENDPOINT + '/restaurants/facets', options).then(function(response) {
+                var facets = response.data[0];
+                self.facets.cuisine = facets.cuisines;
+                self.facets.borough = facets.boroughs;
             });
         },
         fetchRestaurantsCount: function() {
@@ -70,17 +80,18 @@ var app = new Vue({
             return {
                 page: this.page,
                 cuisine: this.selectedFacets.cuisine,
+                borough: this.selectedFacets.borough,
             };
         },
     },
     watch: {
         filters: function() { // fetch restaurants every time filters change
-            this.fetchRestaurants();
+            this.fetchRestaurantsAndFacets();
         },
     },
     mounted: function() {
         this.fetchRestaurantsCount();
-        this.fetchRestaurants();
+        this.fetchRestaurantsAndFacets();
     }
 });
     
