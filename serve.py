@@ -11,10 +11,13 @@ API_ENDPOINT = '/api'
 
 @app.route(API_ENDPOINT + "/restaurants/")
 def restaurants():
-    limit = request.args.get('limit', 50)
-    limit = limit if limit <= 50 else 50
+    page = int(request.args.get('page', '0'))
+    page_size = int(request.args.get('page-size', '50'))
 
-    restaurants = loads(dumps(db.restaurants.find().limit(limit)))
+    skip = page * page_size
+    limit = min(page_size, 50)
+
+    restaurants = loads(dumps(db.restaurants.find().skip(skip).limit(limit)))
 
     for restaurant in restaurants: # remove _id, is an ObjectId and is not serializable
         restaurant.pop('_id')
