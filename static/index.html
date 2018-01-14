@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Client</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+
+    <div id="main"></div>
+
+    <script type="text/x-template" id="app">
+      <div>
+        <h2>Hello from Vue!</h2>
+        <button @click="helloAsk">Is Flask there?</button>
+        <h3>{{ answer }}</h3>
+      </div>
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.13/vue.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.17.1/axios.min.js"></script>
+    <script src="app.js"></script>
+
+  </body>
+</html>
