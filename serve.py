@@ -74,7 +74,7 @@ def _get_group_pipeline(group_by):
             '$sort': {'count': -1}
         },
         {
-            '$limit': 5,
+            '$limit': 6,
         }
     ]
 
@@ -131,7 +131,7 @@ def restaurants_and_facets():
         }
     }]
 
-    restaurant_facets = loads(dumps(db.restaurants.aggregate(pipeline))).pop()
+    restaurant_facets = list(db.restaurants.aggregate(pipeline)).pop()
 
     return jsonify(restaurant_facets)
 
