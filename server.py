@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='client')
 client = MongoClient('localhost:27017')
 db = client.test
 
@@ -47,10 +47,6 @@ def _get_facet_zipcode(boroughs, cuisines):
     pipeline = [
         {'$match': match},
     ] if match else []
-
-    pipeline += [
-        {'$unwind': '$address'}
-    ]
 
     return pipeline + _get_group_pipeline('address.zipcode')
 
