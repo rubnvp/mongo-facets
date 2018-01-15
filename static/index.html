@@ -11,7 +11,7 @@
 
     <script type="text/x-template" id="app">
       <div>
-        <h2>Restaurants count: {{ restaurantsCount }}</h2>
+        <h2>Searching in {{ restaurantsCount }} restaurants.</h2>
 
         <div class="restaurants-navigation">
           <h4>NY Restaurants:</h4>
@@ -19,7 +19,7 @@
             <input type="text" placeholder="search" v-model="search">
           </span>
           <div>
-            Page: {{ page }}
+            Page: {{ page + 1 }} of {{ pagesCount }}
             <button @click="previousPage"> <-- </button>
             <button @click="nextPage"> --> </button>
           </div>

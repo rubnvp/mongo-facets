@@ -9,6 +9,7 @@ var app = new Vue({
     data: function() {
         return {
             page: 0,
+            pageSize: 50,
             search: '',
             selectedFacets: {
                 cuisine: [],
@@ -23,6 +24,11 @@ var app = new Vue({
             restaurants: [],
             restaurantsCount: '',
         };
+    },
+    computed: {
+        pagesCount: function() {
+            return Math.floor(this.restaurantsCount / this.pageSize) + 1;
+        },
     },
     watch: {
         search: function() {
@@ -65,6 +71,7 @@ var app = new Vue({
             var options = {
                 params: {
                     page: this.page,
+                    page_size: this.pageSize,
                     search: this.search,
                     boroughs: this.selectedFacets.borough.join(','),
                     cuisines: this.selectedFacets.cuisine.join(','),
@@ -82,13 +89,15 @@ var app = new Vue({
             var self = this;
             var options = this.getQueryOptions();
             axios.get(API_ENDPOINT + '/restaurants', options).then(function(response) {
-                self.restaurants = response.data;
+                self.restaurants = response.data.restaurants;
+                self.restaurantsCount = response.data.count;
             });
         },
         fetchFacets: function() {
             var self = this;
             var options = this.getQueryOptions();
             delete options.params.page;
+            delete options.params.page_size;
             axios.get(API_ENDPOINT + '/restaurants/facets', options).then(function(response) {
                 self.facets.borough = _getOrderedFacets(
                     self.selectedFacets.borough,
@@ -107,15 +116,8 @@ var app = new Vue({
                 );
             });
         },
-        fetchRestaurantsCount: function() {
-            var self = this;
-            return axios.get(API_ENDPOINT + '/restaurants/count').then(function(response) {
-                self.restaurantsCount = response.data;
-            });
-        },
     },
     mounted: function() {
-        this.fetchRestaurantsCount();
         this.fetchRestaurants();
         this.fetchFacets();
     }

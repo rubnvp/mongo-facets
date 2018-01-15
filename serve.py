@@ -95,21 +95,38 @@ def restaurants():
     cuisines = _get_array_param(request.args.get('cuisines', ''))
     zipcode = _get_array_param(request.args.get('zipcodes', ''))
 
-    find = {}
+    match = {}
     if search:
-        find['$text'] = {'$search': search}
+        match['$text'] = {'$search': search}
     if boroughs:
-        find['borough'] = {'$in': boroughs}
+        match['borough'] = {'$in': boroughs}
     if cuisines:
-        find['cuisine'] = {'$in': cuisines}
+        match['cuisine'] = {'$in': cuisines}
     if zipcode:
-        find['address.zipcode'] = {'$in': zipcode}
+        match['address.zipcode'] = {'$in': zipcode}
 
-    restaurants = list(db.restaurants.find(find).skip(skip).limit(limit))
+    pipeline = [{
+        '$match': match
+    }] if match else []
 
-    for restaurant in restaurants: # remove _id, is an ObjectId and is not serializable
+    pipeline += [{
+        '$facet': {
+            'restaurants': [
+                {'$skip': skip},
+                {'$limit': limit}
+            ],
+            'count': [
+                {'$count': 'total'}
+            ],
+        }
+    }]
+
+    result = list(db.restaurants.aggregate(pipeline)).pop()
+
+    for restaurant in result['restaurants']: # remove _id, is an ObjectId and is not serializable
         restaurant.pop('_id')
-    return jsonify(restaurants)
+    result['count'] = result['count'].pop()['total'] if result['count'] else 0
+    return jsonify(result)
 
 @app.route(API_ENDPOINT + "/restaurants/facets")
 def restaurants_and_facets():
