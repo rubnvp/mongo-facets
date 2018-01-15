@@ -38,11 +38,11 @@ var app = new Vue({
         selectedFilters: function() {
             return []
                 .concat(
-                    this.selected.cuisine.map(function(value){return {value: value, type: 'cuisine'};})
+                    this.selected.cuisine.map(function(value){return {value: value, type: 'cuisine', icon: 'cutlery'};})
                 ).concat(
-                    this.selected.borough.map(function(value){return {value: value, type: 'borough'};})
+                    this.selected.borough.map(function(value){return {value: value, type: 'borough', icon: 'building'};})
                 ).concat(
-                    this.selected.zipcode.map(function(value){return {value: value, type: 'zipcode'};})
+                    this.selected.zipcode.map(function(value){return {value: value, type: 'zipcode', icon: 'map-marker'};})
                 );
         },
     },

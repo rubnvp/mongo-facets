@@ -7,7 +7,10 @@
   </head>
   <body>
 
+
     <div id="main"></div>
+
+    <script src="https://use.fontawesome.com/ae4af477ce.js"></script>
 
     <script type="text/x-template" id="app">
       <div>
@@ -19,6 +22,7 @@
         <div class="selected-facets" :style="{visibility: selectedFilters.length ? '' : 'hidden'}">
             <span>Filtering by: </span>
             <span v-for="chip in selectedFilters" @click="removeChip(chip)" class="facet-chip">
+                <i :class="'fa fa-'+chip.icon" aria-hidden="true"></i>
                 {{ chip.value }} <span class="close">✖</span>
             </span>
             <span class="clear-all" @click="clearAll" v-if="selectedFilters.length > 1">clear all ✖</span>
@@ -41,7 +45,7 @@
           <div class="restaurant-facets">
 
             <div class="list-facet">
-              <div><b>Cuisine</b></div>
+              <div><i class="fa fa-cutlery" aria-hidden="true"></i><b> Cuisine</b></div>
               <div
                 v-for="facet in all.cuisine"
                 class="facet-item"
@@ -52,7 +56,7 @@
             </div>
 
             <div class="list-facet">
-              <div><b>Borough</b></div>
+              <div><i class="fa fa-building" aria-hidden="true"></i><b> Borough</b></div>
               <div
                 v-for="facet in all.borough"
                 class="facet-item"
@@ -63,7 +67,7 @@
             </div>
 
             <div class="list-facet">
-              <div><b>Zipcode</b></div>
+              <div><i class="fa fa-map-marker" aria-hidden="true"></i><b> Zipcode</b></div>
               <div
                 v-for="facet in all.zipcode"
                 class="facet-item"
@@ -78,7 +82,7 @@
           <div class="restaurants-list">
             <div v-for="restaurant in all.restaurants" class="restaurant-card">
               <div><b>{{ restaurant.name }}</b></div>
-              <div>Cuisine: {{ restaurant.cuisine }}</div>
+              <div><i class="fa fa-cutlery" aria-hidden="true"></i> {{ restaurant.cuisine }}</div>
               <div>{{ restaurant.address.building + ', ' + restaurant.address.street }}</div>
               <div>{{ restaurant.borough + ', New York ' + restaurant.address.zipcode }}</div>
               <div>United States</div>
