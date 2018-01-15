@@ -19,6 +19,10 @@ body {
     margin-right: 10px;
 }
 
+.list-facet {
+    margin-bottom: 10px;
+}
+
 .facet-item {
     cursor: pointer;
     padding: 5px;

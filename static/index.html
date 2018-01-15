@@ -27,9 +27,9 @@
           <div class="restaurant-facets">
 
             <div class="list-facet">
-              <div><b>Cuisine:</b></div>
+              <div><b>Borough:</b></div>
               <div
-                v-for="facet in facets.cuisine"
+                v-for="facet in facets.borough"
                 class="facet-item"
                 :class="{selected: isFacetSelected(facet)}"
                 @click="facetClicked(facet)">
@@ -38,9 +38,9 @@
             </div>
 
             <div class="list-facet">
-              <div><b>Borough:</b></div>
+              <div><b>Cuisine:</b></div>
               <div
-                v-for="facet in facets.borough"
+                v-for="facet in facets.cuisine"
                 class="facet-item"
                 :class="{selected: isFacetSelected(facet)}"
                 @click="facetClicked(facet)">

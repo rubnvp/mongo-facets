@@ -60,12 +60,9 @@ var app = new Vue({
             if (!options.params.boroughs.length) delete options.params.boroughs;
 
             axios.get(API_ENDPOINT + '/restaurants', options).then(function(response) {
-                self.restaurants = response.data;
-            });
-            axios.get(API_ENDPOINT + '/restaurants/facets', options).then(function(response) {
-                var facets = response.data[0];
-                self.facets.cuisine = facets.cuisines;
-                self.facets.borough = facets.boroughs;
+                self.restaurants = response.data.restaurants;
+                self.facets.cuisine = response.data.cuisines;
+                self.facets.borough = response.data.boroughs;
             });
         },
         fetchRestaurantsCount: function() {
