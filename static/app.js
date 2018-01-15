@@ -24,9 +24,11 @@ var app = new Vue({
     methods: {
         previousPage: function() {
             this.page--;
+            this.fetchRestaurants();
         },
         nextPage: function() {
             this.page++;
+            this.fetchRestaurants();
         },
         facetClicked: function(facet) {
             var facetList = this.selectedFacets[facet.type];
@@ -40,14 +42,16 @@ var app = new Vue({
             else { // remove facet
                 facetList.splice(facetIndex, 1);
             }
+            this.page = 0;
+            this.fetchRestaurants();
+            this.fetchFacets();
         },
         isFacetSelected: function(facet) {
             var facetList = this.selectedFacets[facet.type];
             if (!facetList) return false;
             return facetList.indexOf(facet.value) !== -1;
         },
-        fetchRestaurantsAndFacets: function() {
-            var self = this;
+        getQueryOptions: function() {
             var options = {
                 params: {
                     page: this.page,
@@ -55,12 +59,23 @@ var app = new Vue({
                     boroughs: this.selectedFacets.borough.join(','),
                 }
             };
-
+            if (this.page <= 0) delete options.params.page;
             if (!options.params.cuisines.length) delete options.params.cuisines;
             if (!options.params.boroughs.length) delete options.params.boroughs;
-
+            return options;
+        },
+        fetchRestaurants: function() {
+            var self = this;
+            var options = this.getQueryOptions();
             axios.get(API_ENDPOINT + '/restaurants', options).then(function(response) {
-                self.restaurants = response.data.restaurants;
+                self.restaurants = response.data;
+            });
+        },
+        fetchFacets: function() {
+            var self = this;
+            var options = this.getQueryOptions();
+            delete options.params.page;
+            axios.get(API_ENDPOINT + '/restaurants/facets', options).then(function(response) {
                 self.facets.cuisine = response.data.cuisines;
                 self.facets.borough = response.data.boroughs;
             });
@@ -72,23 +87,10 @@ var app = new Vue({
             });
         },
     },
-    computed: {
-        filters: function() { // computed property to watch
-            return {
-                page: this.page,
-                cuisine: this.selectedFacets.cuisine,
-                borough: this.selectedFacets.borough,
-            };
-        },
-    },
-    watch: {
-        filters: function() { // fetch restaurants every time filters change
-            this.fetchRestaurantsAndFacets();
-        },
-    },
     mounted: function() {
         this.fetchRestaurantsCount();
-        this.fetchRestaurantsAndFacets();
+        this.fetchRestaurants();
+        this.fetchFacets();
     }
 });
     

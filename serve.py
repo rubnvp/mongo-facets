@@ -9,29 +9,6 @@ db = client.test
 def _get_array_param(param):
     return filter(None, param.split(","))
 
-def _get_restaurants_pipeline(skip, limit, boroughs, cuisines):
-    match = {}
-
-    if boroughs:
-        match['borough'] = {'$in': boroughs}
-    if cuisines:
-        match['cuisine'] = {'$in': cuisines}
-
-    pipeline = [
-        {'$match': match}
-    ] if match else []
-
-    pipeline += [
-        {
-            '$skip': skip,
-        },
-        {
-            '$limit': limit,
-        }
-    ]
-
-    return pipeline
-
 def _get_facet_borough(cuisines):
     match = {}
 
@@ -84,7 +61,7 @@ def _get_group_pipeline(group_by):
 API_ENDPOINT = '/api'
 
 @app.route(API_ENDPOINT + "/restaurants")
-def restaurants_and_facets():
+def restaurants():
     # pagination
     page = int(request.args.get('page', '0'))
     page_size = int(request.args.get('page-size', '50'))
@@ -95,17 +72,32 @@ def restaurants_and_facets():
     cuisines = _get_array_param(request.args.get('cuisines', ''))
     boroughs = _get_array_param(request.args.get('boroughs', ''))
 
+    find = {}
+    if boroughs:
+        find['borough'] = {'$in': boroughs}
+    if cuisines:
+        find['cuisine'] = {'$in': cuisines}
+
+    restaurants = list(db.restaurants.find(find).skip(skip).limit(limit))
+
+    for restaurant in restaurants: # remove _id, is an ObjectId and is not serializable
+        restaurant.pop('_id')
+    return jsonify(restaurants)
+
+@app.route(API_ENDPOINT + "/restaurants/facets")
+def restaurants_and_facets():
+    # filters
+    cuisines = _get_array_param(request.args.get('cuisines', ''))
+    boroughs = _get_array_param(request.args.get('boroughs', ''))
+
     facet = {
-        'restaurants': _get_restaurants_pipeline(skip, limit, boroughs, cuisines),
         'boroughs': _get_facet_borough(cuisines),
         'cuisines': _get_facet_cuisine(boroughs),
     }
 
-    restaurants_and_facets = loads(dumps(db.restaurants.aggregate([{'$facet': facet}]))).pop()
+    restaurant_facets = loads(dumps(db.restaurants.aggregate([{'$facet': facet}]))).pop()
 
-    for restaurant in restaurants_and_facets['restaurants']: # remove _id, is an ObjectId and is not serializable
-        restaurant.pop('_id')
-    return jsonify(restaurants_and_facets)
+    return jsonify(restaurant_facets)
 
 @app.route(API_ENDPOINT + "/restaurants/count")
 def restaurants_count():
