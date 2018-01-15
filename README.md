@@ -2,6 +2,8 @@
 
 These are the specific steps to build this demo of faceted search navigation implemented with the stack: VueJS, Flask, MongoDB.
 
+![screensot demo](screenshot-demo.png "Screenshot Demo")
+
 ## Installing stuff
 Everything assumes a MacOSX environment.
 
