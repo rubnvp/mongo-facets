@@ -9,7 +9,7 @@ API_ENDPOINT = '/api/v1'
 def _get_array_param(param):
     return filter(None, param.split(","))
 
-def _get_facet_borough(cuisines, zipcodes):
+def _get_facet_borough_pipeline(cuisines, zipcodes):
     match = {}
 
     if cuisines:
@@ -23,7 +23,7 @@ def _get_facet_borough(cuisines, zipcodes):
 
     return pipeline + _get_group_pipeline('borough')
 
-def _get_facet_cuisine(boroughs, zipcodes):
+def _get_facet_cuisine_pipeline(boroughs, zipcodes):
     match = {}
 
     if boroughs:
@@ -37,7 +37,7 @@ def _get_facet_cuisine(boroughs, zipcodes):
 
     return pipeline + _get_group_pipeline('cuisine')
 
-def _get_facet_zipcode(boroughs, cuisines):
+def _get_facet_zipcode_pipeline(boroughs, cuisines):
     match = {}
 
     if boroughs:
@@ -136,9 +136,9 @@ def restaurants_and_facets():
 
     pipeline += [{
         '$facet': {
-            'borough': _get_facet_borough(cuisines, zipcodes),
-            'cuisine': _get_facet_cuisine(boroughs, zipcodes),
-            'zipcode': _get_facet_zipcode(boroughs, cuisines),
+            'borough': _get_facet_borough_pipeline(cuisines, zipcodes),
+            'cuisine': _get_facet_cuisine_pipeline(boroughs, zipcodes),
+            'zipcode': _get_facet_zipcode_pipeline(boroughs, cuisines),
         }
     }]
 
