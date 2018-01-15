@@ -65,17 +65,17 @@ var app = new Vue({
         removeChip: function(chip) {
             this.removeFacet(chip.value, chip.type);
         },
-        facetClicked: function(facet) {
-            var facetList = this.selected[facet.type];
+        facetClicked: function(value, type) {
+            var facetList = this.selected[type];
             if (!facetList) return;
 
-            var facetIndex = facetList.indexOf(facet.value);
+            var facetIndex = facetList.indexOf(value);
             // add facet
             if (facetIndex === -1 ) {
-                this.addFacet(facet.value, facet.type);
+                this.addFacet(value, type);
             }
             else { // remove facet
-                this.removeFacet(facet.value, facet.type);
+                this.removeFacet(value, type);
             }
         },
         addFacet: function(value, type) {
@@ -91,10 +91,10 @@ var app = new Vue({
             this.fetchRestaurants();
             this.fetchFacets();
         },
-        isFacetSelected: function(facet) {
-            var facetList = this.selected[facet.type];
+        isFacetSelected: function(value, type) {
+            var facetList = this.selected[type];
             if (!facetList) return false;
-            return facetList.indexOf(facet.value) !== -1;
+            return facetList.indexOf(value) !== -1;
         },
         clearAll: function() {
             this.selected.cuisine = [];
@@ -138,18 +138,15 @@ var app = new Vue({
             return axios.get(API_ENDPOINT + '/restaurants/facets', options).then(function(response) {
                 self.all.borough = _getOrderedFacets(
                     self.selected.borough,
-                    response.data.borough,
-                    'borough'
+                    response.data.borough
                 );
                 self.all.cuisine = _getOrderedFacets(
                     self.selected.cuisine,
-                    response.data.cuisine,
-                    'cuisine'
+                    response.data.cuisine
                 );
                 self.all.zipcode = _getOrderedFacets(
                     self.selected.zipcode,
-                    response.data.zipcode,
-                    'zipcode'
+                    response.data.zipcode
                 );
             });
         },
@@ -160,7 +157,7 @@ var app = new Vue({
     }
 });
 
-function _getOrderedFacets(selectedValues, facets, type) {
+function _getOrderedFacets(selectedValues, facets) {
     return selectedValues
         .map(function(value) { // get selected facets (and add count if exists)
             var facet = facets.find(function(facet) {
@@ -175,11 +172,7 @@ function _getOrderedFacets(selectedValues, facets, type) {
             facets.filter(function(facet){ 
                 return selectedValues.indexOf(facet.value) === -1;
             })
-        )
-        .map(function(facet) {
-            facet.type = type;
-            return facet;
-        });
+        );
 }
     
 })(); 

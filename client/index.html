@@ -48,9 +48,9 @@
               <div><i class="fa fa-cutlery" aria-hidden="true"></i><b> Cuisine</b></div>
               <div
                 v-for="facet in all.cuisine"
-                class="facet-item"
-                :class="{selected: isFacetSelected(facet)}"
-                @click="facetClicked(facet)">
+                class="facet-item text-clickable"
+                :class="{selected: isFacetSelected(facet.value, 'cuisine')}"
+                @click="facetClicked(facet.value, 'cuisine')">
                 {{ facet.value + ' (' + facet.count + ')' }}
               </div>
             </div>
@@ -59,9 +59,9 @@
               <div><i class="fa fa-building" aria-hidden="true"></i><b> Borough</b></div>
               <div
                 v-for="facet in all.borough"
-                class="facet-item"
-                :class="{selected: isFacetSelected(facet)}"
-                @click="facetClicked(facet)">
+                class="facet-item text-clickable"
+                :class="{selected: isFacetSelected(facet.value, 'borough')}"
+                @click="facetClicked(facet.value, 'borough')">
                 {{ facet.value + ' (' + facet.count + ')' }}
               </div>
             </div>
@@ -70,9 +70,9 @@
               <div><i class="fa fa-map-marker" aria-hidden="true"></i><b> Zipcode</b></div>
               <div
                 v-for="facet in all.zipcode"
-                class="facet-item"
-                :class="{selected: isFacetSelected(facet)}"
-                @click="facetClicked(facet)">
+                class="facet-item text-clickable"
+                :class="{selected: isFacetSelected(facet.value, 'zipcode')}"
+                @click="facetClicked(facet.value, 'zipcode')">
                 {{ facet.value + ' (' + facet.count + ')' }}
               </div>
             </div>
@@ -82,9 +82,13 @@
           <div class="restaurants-list">
             <div v-for="restaurant in all.restaurants" class="restaurant-card">
               <div><b>{{ restaurant.name }}</b></div>
-              <div><i class="fa fa-cutlery" aria-hidden="true"></i> {{ restaurant.cuisine }}</div>
+              <div @click="facetClicked(restaurant.cuisine, 'cuisine')" class="text-clickable"><i class="fa fa-cutlery" aria-hidden="true"></i> {{ restaurant.cuisine }}</div>
               <div>{{ restaurant.address.building + ', ' + restaurant.address.street }}</div>
-              <div>{{ restaurant.borough + ', New York ' + restaurant.address.zipcode }}</div>
+              <div>
+                  <span @click="facetClicked(restaurant.borough, 'borough')" class="text-clickable">{{ restaurant.borough }}</span>
+                  , New York
+                  <span @click="facetClicked(restaurant.address.zipcode, 'zipcode')" class="text-clickable">{{ restaurant.address.zipcode }}</span>
+              </div>
               <div>United States</div>
             </div>
           </div>

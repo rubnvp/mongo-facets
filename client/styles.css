@@ -3,6 +3,14 @@ body {
     color: #2c3e50;
 }
 
+.text-clickable {
+    cursor: pointer;
+}
+
+.text-clickable:hover {
+    background-color: #eee;
+}
+
 .page-title {
     display: flex;
     align-items: center;
@@ -81,16 +89,11 @@ body {
 }
 
 .facet-item {
-    cursor: pointer;
     padding: 5px;
 }
 
 .facet-item.selected {
     font-weight: bold;
-}
-
-.facet-item:hover {
-    background-color: #eee;
 }
 
 .restaurants-list {
