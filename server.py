@@ -115,11 +115,11 @@ def restaurants():
         }
     }]
 
-    result = list(db.restaurants.aggregate(pipeline)).pop()
+    result = list(db.restaurants.aggregate(pipeline))[0]
 
     for restaurant in result['restaurants']: # remove _id, is an ObjectId and is not serializable
-        restaurant.pop('_id')
-    result['count'] = result['count'].pop()['total'] if result['count'] else 0
+        del restaurant['_id']
+    result['count'] = result['count'][0]['total'] if result['count'] else 0
     return jsonify(result)
 
 @app.route(API_ENDPOINT + "/restaurants/facets")
@@ -142,7 +142,7 @@ def restaurants_and_facets():
         }
     }]
 
-    restaurant_facets = list(db.restaurants.aggregate(pipeline)).pop()
+    restaurant_facets = list(db.restaurants.aggregate(pipeline))[0]
 
     return jsonify(restaurant_facets)
 

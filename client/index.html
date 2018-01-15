@@ -12,8 +12,16 @@
     <script type="text/x-template" id="app">
       <div>
         <div class="page-title">
-            <h2>Searching in {{ restaurantsCount }} restaurants.</h2>
-            <span class="clear-all" @click="clearAll" v-if="selectedFilters.length">clear all ✖</span>
+            <img src="logo.png" class="logo" alt="forl and spoon crossed">
+            <h2>La cuchara. Searching in {{ restaurantsCount }} restaurants.</h2>
+        </div>
+
+        <div class="selected-facets" :style="{visibility: selectedFilters.length ? '' : 'hidden'}">
+            <span>Filtering by: </span>
+            <span v-for="chip in selectedFilters" @click="removeChip(chip)" class="facet-chip">
+                {{ chip.value }} <span class="close">✖</span>
+            </span>
+            <span class="clear-all" @click="clearAll" v-if="selectedFilters.length > 1">clear all ✖</span>
         </div>
 
         <div class="restaurants-navigation">
@@ -23,8 +31,8 @@
           </span>
           <div>
             Page {{ page + 1 }} of {{ pagesCount }}
-            <button @click="previousPage" :disabled="previousPageDisabled"> <-- </button>
-            <button @click="nextPage" :disabled="nextPageDisabled"> --> </button>
+            <button @click="previousPage" class="page-button" title="previous page" :disabled="previousPageDisabled"> ‹ </button>
+            <button @click="nextPage" class="page-button" title="next page" :disabled="nextPageDisabled"> › </button>
           </div>
         </div>
 

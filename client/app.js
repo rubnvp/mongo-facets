@@ -36,7 +36,14 @@ var app = new Vue({
             return this.page === this.pagesCount - 1;
         },
         selectedFilters: function() {
-            return this.selected.cuisine.concat(this.selected.borough).concat(this.selected.zipcode);
+            return []
+                .concat(
+                    this.selected.cuisine.map(function(value){return {value: value, type: 'cuisine'};})
+                ).concat(
+                    this.selected.borough.map(function(value){return {value: value, type: 'borough'};})
+                ).concat(
+                    this.selected.zipcode.map(function(value){return {value: value, type: 'zipcode'};})
+                );
         },
     },
     watch: {
@@ -55,6 +62,9 @@ var app = new Vue({
             this.page++;
             this.fetchRestaurants();
         },
+        removeChip: function(chip) {
+            this.removeFacet(chip.value, chip.type);
+        },
         facetClicked: function(facet) {
             var facetList = this.selected[facet.type];
             if (!facetList) return;
@@ -62,11 +72,21 @@ var app = new Vue({
             var facetIndex = facetList.indexOf(facet.value);
             // add facet
             if (facetIndex === -1 ) {
-                facetList.push(facet.value);
+                this.addFacet(facet.value, facet.type);
             }
             else { // remove facet
-                facetList.splice(facetIndex, 1);
+                this.removeFacet(facet.value, facet.type);
             }
+        },
+        addFacet: function(value, type) {
+            this.selected[type].push(value);
+            this.page = 0;
+            this.fetchRestaurants();
+            this.fetchFacets();
+        },
+        removeFacet: function(value, type) {
+            var facetIndex = this.selected[type].indexOf(value);
+            this.selected[type].splice(facetIndex, 1);
             this.page = 0;
             this.fetchRestaurants();
             this.fetchFacets();

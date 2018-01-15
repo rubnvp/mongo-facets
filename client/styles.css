@@ -5,7 +5,27 @@ body {
 
 .page-title {
     display: flex;
+    align-items: center;
+}
+
+.page-title .logo {
+    height: 26px;
+    margin-right: 10px;
+}
+
+.selected-factes {
+    display: flex;
     align-items: baseline;
+}
+
+.selected-facets .facet-chip {
+    min-height: 32px;
+    padding: 0 12px;
+    font-size: 14px;
+    border: 1px solid #e0e0e0;
+    border-radius: 2rem;
+    cursor: pointer;
+    margin-left: 5px;
 }
 
 .clear-all {
@@ -20,6 +40,19 @@ body {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
+}
+
+.restaurants-navigation .page-button {
+    border: none;
+    display: inline-block;
+    outline: 0;
+    padding: 4px 13px;
+    font-size: 20px;
+    overflow: hidden;
+    background-color: #f1f1f1;
+    cursor: pointer;
+    border-radius: 50%;
+    border: 1px solid #ccc;
 }
 
 .searchbox {
