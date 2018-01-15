@@ -1,7 +1,7 @@
 (function() {
 "use strict";
 
-var API_ENDPOINT = '/api';
+var API_ENDPOINT = '/api/v1';
     
 var app = new Vue({
     el: '#main',
@@ -11,17 +11,17 @@ var app = new Vue({
             page: 0,
             pageSize: 50,
             search: '',
-            selectedFacets: {
+            selected: {
                 cuisine: [],
                 borough: [],
                 zipcode: [],
             },
-            facets: {
+            all: {
                 cuisine: [],
                 borough: [],
                 zipcode: [],
+                restaurants: [],
             },
-            restaurants: [],
             restaurantsCount: '',
         };
     },
@@ -34,6 +34,9 @@ var app = new Vue({
         },
         nextPageDisabled: function() {
             return this.page === this.pagesCount - 1;
+        },
+        selectedFilters: function() {
+            return this.selected.cuisine.concat(this.selected.borough).concat(this.selected.zipcode);
         },
     },
     watch: {
@@ -53,7 +56,7 @@ var app = new Vue({
             this.fetchRestaurants();
         },
         facetClicked: function(facet) {
-            var facetList = this.selectedFacets[facet.type];
+            var facetList = this.selected[facet.type];
             if (!facetList) return;
 
             var facetIndex = facetList.indexOf(facet.value);
@@ -69,9 +72,17 @@ var app = new Vue({
             this.fetchFacets();
         },
         isFacetSelected: function(facet) {
-            var facetList = this.selectedFacets[facet.type];
+            var facetList = this.selected[facet.type];
             if (!facetList) return false;
             return facetList.indexOf(facet.value) !== -1;
+        },
+        clearAll: function() {
+            this.selected.cuisine = [];
+            this.selected.borough = [];
+            this.selected.zipcode = [];
+            this.page = 0;
+            this.fetchRestaurants();
+            this.fetchFacets();
         },
         getQueryOptions: function() {
             var options = {
@@ -79,9 +90,9 @@ var app = new Vue({
                     page: this.page,
                     page_size: this.pageSize,
                     search: this.search,
-                    boroughs: this.selectedFacets.borough.join(','),
-                    cuisines: this.selectedFacets.cuisine.join(','),
-                    zipcodes: this.selectedFacets.zipcode.join(','),
+                    boroughs: this.selected.borough.join(','),
+                    cuisines: this.selected.cuisine.join(','),
+                    zipcodes: this.selected.zipcode.join(','),
                 }
             };
             if (this.page <= 0) delete options.params.page;
@@ -94,8 +105,8 @@ var app = new Vue({
         fetchRestaurants: function() {
             var self = this;
             var options = this.getQueryOptions();
-            axios.get(API_ENDPOINT + '/restaurants', options).then(function(response) {
-                self.restaurants = response.data.restaurants;
+            return axios.get(API_ENDPOINT + '/restaurants', options).then(function(response) {
+                self.all.restaurants = response.data.restaurants;
                 self.restaurantsCount = response.data.count;
             });
         },
@@ -104,19 +115,19 @@ var app = new Vue({
             var options = this.getQueryOptions();
             delete options.params.page;
             delete options.params.page_size;
-            axios.get(API_ENDPOINT + '/restaurants/facets', options).then(function(response) {
-                self.facets.borough = _getOrderedFacets(
-                    self.selectedFacets.borough,
+            return axios.get(API_ENDPOINT + '/restaurants/facets', options).then(function(response) {
+                self.all.borough = _getOrderedFacets(
+                    self.selected.borough,
                     response.data.borough,
                     'borough'
                 );
-                self.facets.cuisine = _getOrderedFacets(
-                    self.selectedFacets.cuisine,
+                self.all.cuisine = _getOrderedFacets(
+                    self.selected.cuisine,
                     response.data.cuisine,
                     'cuisine'
                 );
-                self.facets.zipcode = _getOrderedFacets(
-                    self.selectedFacets.zipcode,
+                self.all.zipcode = _getOrderedFacets(
+                    self.selected.zipcode,
                     response.data.zipcode,
                     'zipcode'
                 );

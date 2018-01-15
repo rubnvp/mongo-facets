@@ -4,6 +4,7 @@ from pymongo import MongoClient
 app = Flask(__name__, static_folder='client')
 client = MongoClient('localhost:27017')
 db = client.test
+API_ENDPOINT = '/api/v1'
 
 def _get_array_param(param):
     return filter(None, param.split(","))
@@ -74,8 +75,6 @@ def _get_group_pipeline(group_by):
     ]
 
 # API
-API_ENDPOINT = '/api'
-
 @app.route(API_ENDPOINT + "/restaurants")
 def restaurants():
     # pagination

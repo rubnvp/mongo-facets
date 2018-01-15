@@ -3,6 +3,19 @@ body {
     color: #2c3e50;
 }
 
+.page-title {
+    display: flex;
+    align-items: baseline;
+}
+
+.clear-all {
+    cursor: pointer;
+    font-size: 10px;
+    margin-left: 5px;
+    color: dodgerblue;
+    text-decoration: underline;
+}
+
 .restaurants-navigation {
     display: flex;
     align-items: baseline;

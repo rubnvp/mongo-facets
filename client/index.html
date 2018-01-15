@@ -11,10 +11,13 @@
 
     <script type="text/x-template" id="app">
       <div>
-        <h2>Searching in {{ restaurantsCount }} restaurants.</h2>
+        <div class="page-title">
+            <h2>Searching in {{ restaurantsCount }} restaurants.</h2>
+            <span class="clear-all" @click="clearAll" v-if="selectedFilters.length">clear all ✖</span>
+        </div>
 
         <div class="restaurants-navigation">
-          <h4>NY Restaurants:</h4>
+          <h3>NY Restaurants</h3>
           <span>
             <input type="text" class="searchbox" placeholder="search" v-model="search">
           </span>
@@ -30,9 +33,9 @@
           <div class="restaurant-facets">
 
             <div class="list-facet">
-              <div><b>Cuisine:</b></div>
+              <div><b>Cuisine</b></div>
               <div
-                v-for="facet in facets.cuisine"
+                v-for="facet in all.cuisine"
                 class="facet-item"
                 :class="{selected: isFacetSelected(facet)}"
                 @click="facetClicked(facet)">
@@ -41,9 +44,9 @@
             </div>
 
             <div class="list-facet">
-              <div><b>Borough:</b></div>
+              <div><b>Borough</b></div>
               <div
-                v-for="facet in facets.borough"
+                v-for="facet in all.borough"
                 class="facet-item"
                 :class="{selected: isFacetSelected(facet)}"
                 @click="facetClicked(facet)">
@@ -52,9 +55,9 @@
             </div>
 
             <div class="list-facet">
-              <div><b>Zipcode:</b></div>
+              <div><b>Zipcode</b></div>
               <div
-                v-for="facet in facets.zipcode"
+                v-for="facet in all.zipcode"
                 class="facet-item"
                 :class="{selected: isFacetSelected(facet)}"
                 @click="facetClicked(facet)">
@@ -65,7 +68,7 @@
           </div>
 
           <div class="restaurants-list">
-            <div v-for="restaurant in restaurants" class="restaurant-card">
+            <div v-for="restaurant in all.restaurants" class="restaurant-card">
               <div><b>{{ restaurant.name }}</b></div>
               <div>Cuisine: {{ restaurant.cuisine }}</div>
               <div>{{ restaurant.address.building + ', ' + restaurant.address.street }}</div>
