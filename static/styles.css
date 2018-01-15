@@ -16,11 +16,13 @@ body {
     display: flex;
     flex-direction: column;
     min-width: 200px;
+    max-width: 200px;
     margin-right: 10px;
 }
 
 .list-facet {
     margin-bottom: 10px;
+    min-height: 185px;
 }
 
 .facet-item {

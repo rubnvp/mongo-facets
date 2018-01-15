@@ -9,11 +9,13 @@ db = client.test
 def _get_array_param(param):
     return filter(None, param.split(","))
 
-def _get_facet_borough(cuisines):
+def _get_facet_borough(cuisines, zipcodes):
     match = {}
 
     if cuisines:
         match['cuisine'] = {'$in': cuisines}
+    if zipcodes:
+        match['address.zipcode'] = {'$in': zipcodes}
 
     pipeline = [
         {'$match': match}
@@ -21,11 +23,13 @@ def _get_facet_borough(cuisines):
 
     return pipeline + _get_group_pipeline('borough')
 
-def _get_facet_cuisine(boroughs):
+def _get_facet_cuisine(boroughs, zipcodes):
     match = {}
 
     if boroughs:
         match['borough'] = {'$in': boroughs}
+    if zipcodes:
+        match['address.zipcode'] = {'$in': zipcodes}
 
     pipeline = [
         {'$match': match}
@@ -33,7 +37,25 @@ def _get_facet_cuisine(boroughs):
 
     return pipeline + _get_group_pipeline('cuisine')
 
-def _get_group_pipeline(group_by):
+def _get_facet_zipcode(boroughs, cuisines):
+    match = {}
+
+    if boroughs:
+        match['borough'] = {'$in': boroughs}
+    if cuisines:
+        match['cuisine'] = {'$in': cuisines}
+
+    pipeline = [
+        {'$match': match},
+    ] if match else []
+
+    pipeline += [
+        {'$unwind': '$address'}
+    ]
+
+    return pipeline + _get_group_pipeline('address.zipcode', 'zipcode')
+
+def _get_group_pipeline(group_by, type=None):
     return [
         {
             '$group': {
@@ -45,7 +67,7 @@ def _get_group_pipeline(group_by):
             '$project': {
                 '_id': 0,
                 'value': '$_id',
-                'type': group_by,
+                'type': type if type else group_by,
                 'count': 1,
             }
         },
@@ -69,14 +91,17 @@ def restaurants():
     limit = min(page_size, 50)
 
     # filters
-    cuisines = _get_array_param(request.args.get('cuisines', ''))
     boroughs = _get_array_param(request.args.get('boroughs', ''))
+    cuisines = _get_array_param(request.args.get('cuisines', ''))
+    zipcode = _get_array_param(request.args.get('zipcodes', ''))
 
     find = {}
     if boroughs:
         find['borough'] = {'$in': boroughs}
     if cuisines:
         find['cuisine'] = {'$in': cuisines}
+    if zipcode:
+        find['address.zipcode'] = {'$in': zipcode}
 
     restaurants = list(db.restaurants.find(find).skip(skip).limit(limit))
 
@@ -87,12 +112,14 @@ def restaurants():
 @app.route(API_ENDPOINT + "/restaurants/facets")
 def restaurants_and_facets():
     # filters
-    cuisines = _get_array_param(request.args.get('cuisines', ''))
     boroughs = _get_array_param(request.args.get('boroughs', ''))
+    cuisines = _get_array_param(request.args.get('cuisines', ''))
+    zipcodes = _get_array_param(request.args.get('zipcodes', ''))
 
     facet = {
-        'boroughs': _get_facet_borough(cuisines),
-        'cuisines': _get_facet_cuisine(boroughs),
+        'borough': _get_facet_borough(cuisines, zipcodes),
+        'cuisine': _get_facet_cuisine(boroughs, zipcodes),
+        'zipcode': _get_facet_zipcode(boroughs, cuisines),
     }
 
     restaurant_facets = loads(dumps(db.restaurants.aggregate([{'$facet': facet}]))).pop()

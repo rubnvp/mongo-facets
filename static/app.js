@@ -12,10 +12,12 @@ var app = new Vue({
             selectedFacets: {
                 cuisine: [],
                 borough: [],
+                zipcode: [],
             },
             facets: {
                 cuisine: [],
                 borough: [],
+                zipcode: [],
             },
             restaurants: [],
             restaurantsCount: '',
@@ -55,13 +57,15 @@ var app = new Vue({
             var options = {
                 params: {
                     page: this.page,
-                    cuisines: this.selectedFacets.cuisine.join(','),
                     boroughs: this.selectedFacets.borough.join(','),
+                    cuisines: this.selectedFacets.cuisine.join(','),
+                    zipcodes: this.selectedFacets.zipcode.join(','),
                 }
             };
             if (this.page <= 0) delete options.params.page;
-            if (!options.params.cuisines.length) delete options.params.cuisines;
-            if (!options.params.boroughs.length) delete options.params.boroughs;
+            if (!options.params.boroughs) delete options.params.boroughs;
+            if (!options.params.cuisines) delete options.params.cuisines;
+            if (!options.params.zipcodes) delete options.params.zipcodes;
             return options;
         },
         fetchRestaurants: function() {
@@ -76,8 +80,21 @@ var app = new Vue({
             var options = this.getQueryOptions();
             delete options.params.page;
             axios.get(API_ENDPOINT + '/restaurants/facets', options).then(function(response) {
-                self.facets.cuisine = response.data.cuisines;
-                self.facets.borough = response.data.boroughs;
+                self.facets.borough = _getOrderedFacets(
+                    self.selectedFacets.borough,
+                    response.data.borough,
+                    'borough'
+                );
+                self.facets.cuisine = _getOrderedFacets(
+                    self.selectedFacets.cuisine,
+                    response.data.cuisine,
+                    'cuisine'
+                );
+                self.facets.zipcode = _getOrderedFacets(
+                    self.selectedFacets.zipcode,
+                    response.data.zipcode,
+                    'zipcode'
+                );
             });
         },
         fetchRestaurantsCount: function() {
@@ -93,5 +110,27 @@ var app = new Vue({
         this.fetchFacets();
     }
 });
+
+function _getOrderedFacets(selectedValues, facets, type) {
+    return selectedValues
+        .map(function(value) { // get selected facets (and add count if exists)
+            var facet = facets.find(function(facet) {
+                return facet.value === value;
+            });
+            return {
+                value: value,
+                count: (facet && facet.count) || 'x',
+            };
+        })
+        .concat( // then add unselect facets (excluding the ones that are selected)
+            facets.filter(function(facet){ 
+                return selectedValues.indexOf(facet.value) === -1;
+            })
+        )
+        .map(function(facet) {
+            facet.type = type;
+            return facet;
+        });
+}
     
 })(); 
