@@ -53,9 +53,9 @@ def _get_facet_zipcode(boroughs, cuisines):
         {'$unwind': '$address'}
     ]
 
-    return pipeline + _get_group_pipeline('address.zipcode', 'zipcode')
+    return pipeline + _get_group_pipeline('address.zipcode')
 
-def _get_group_pipeline(group_by, type=None):
+def _get_group_pipeline(group_by):
     return [
         {
             '$group': {
@@ -67,7 +67,6 @@ def _get_group_pipeline(group_by, type=None):
             '$project': {
                 '_id': 0,
                 'value': '$_id',
-                'type': type if type else group_by,
                 'count': 1,
             }
         },
@@ -91,11 +90,14 @@ def restaurants():
     limit = min(page_size, 50)
 
     # filters
+    search = request.args.get('search', '')
     boroughs = _get_array_param(request.args.get('boroughs', ''))
     cuisines = _get_array_param(request.args.get('cuisines', ''))
     zipcode = _get_array_param(request.args.get('zipcodes', ''))
 
     find = {}
+    if search:
+        find['$text'] = {'$search': search}
     if boroughs:
         find['borough'] = {'$in': boroughs}
     if cuisines:
@@ -112,17 +114,24 @@ def restaurants():
 @app.route(API_ENDPOINT + "/restaurants/facets")
 def restaurants_and_facets():
     # filters
+    search = request.args.get('search', '')
     boroughs = _get_array_param(request.args.get('boroughs', ''))
     cuisines = _get_array_param(request.args.get('cuisines', ''))
     zipcodes = _get_array_param(request.args.get('zipcodes', ''))
 
-    facet = {
-        'borough': _get_facet_borough(cuisines, zipcodes),
-        'cuisine': _get_facet_cuisine(boroughs, zipcodes),
-        'zipcode': _get_facet_zipcode(boroughs, cuisines),
-    }
+    pipeline = [{
+        '$match': {'$text': {'$search': search}}
+    }] if search else []
 
-    restaurant_facets = loads(dumps(db.restaurants.aggregate([{'$facet': facet}]))).pop()
+    pipeline += [{
+        '$facet': {
+            'borough': _get_facet_borough(cuisines, zipcodes),
+            'cuisine': _get_facet_cuisine(boroughs, zipcodes),
+            'zipcode': _get_facet_zipcode(boroughs, cuisines),
+        }
+    }]
+
+    restaurant_facets = loads(dumps(db.restaurants.aggregate(pipeline))).pop()
 
     return jsonify(restaurant_facets)
 

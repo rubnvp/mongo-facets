@@ -5,6 +5,7 @@ body {
 
 .restaurants-navigation {
     display: flex;
+    align-items: baseline;
     justify-content: space-between;
 }
 
@@ -48,6 +49,8 @@ body {
 .restaurant-card {
     display: flex;
     flex-direction: column;
+    max-width: 250px;
+    max-height: 250px;
     padding: 10px;
     margin: 5px;
     border: 1px solid #ccc;

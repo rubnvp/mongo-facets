@@ -9,6 +9,7 @@ var app = new Vue({
     data: function() {
         return {
             page: 0,
+            search: '',
             selectedFacets: {
                 cuisine: [],
                 borough: [],
@@ -22,6 +23,13 @@ var app = new Vue({
             restaurants: [],
             restaurantsCount: '',
         };
+    },
+    watch: {
+        search: function() {
+            this.page = 0;
+            this.fetchRestaurants();
+            this.fetchFacets();
+        },
     },
     methods: {
         previousPage: function() {
@@ -57,12 +65,14 @@ var app = new Vue({
             var options = {
                 params: {
                     page: this.page,
+                    search: this.search,
                     boroughs: this.selectedFacets.borough.join(','),
                     cuisines: this.selectedFacets.cuisine.join(','),
                     zipcodes: this.selectedFacets.zipcode.join(','),
                 }
             };
             if (this.page <= 0) delete options.params.page;
+            if (!this.search) delete options.params.search;
             if (!options.params.boroughs) delete options.params.boroughs;
             if (!options.params.cuisines) delete options.params.cuisines;
             if (!options.params.zipcodes) delete options.params.zipcodes;
