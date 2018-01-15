@@ -29,6 +29,12 @@ var app = new Vue({
         pagesCount: function() {
             return Math.floor(this.restaurantsCount / this.pageSize) + 1;
         },
+        previousPageDisabled: function() {
+            return this.page === 0;
+        },
+        nextPageDisabled: function() {
+            return this.page === this.pagesCount - 1;
+        },
     },
     watch: {
         search: function() {

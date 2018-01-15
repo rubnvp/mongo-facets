@@ -16,12 +16,12 @@
         <div class="restaurants-navigation">
           <h4>NY Restaurants:</h4>
           <span>
-            <input type="text" placeholder="search" v-model="search">
+            <input type="text" placeholder="search in name" v-model="search">
           </span>
           <div>
-            Page: {{ page + 1 }} of {{ pagesCount }}
-            <button @click="previousPage"> <-- </button>
-            <button @click="nextPage"> --> </button>
+            Page {{ page + 1 }} of {{ pagesCount }}
+            <button @click="previousPage" :disabled="previousPageDisabled"> <-- </button>
+            <button @click="nextPage" :disabled="nextPageDisabled"> --> </button>
           </div>
         </div>
 
