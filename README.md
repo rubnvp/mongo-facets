@@ -5,7 +5,7 @@ These are the specific steps to build this demo of faceted search navigation imp
 ![screensot demo](screenshot-demo.png "Screenshot Demo")
 
 ## Installing stuff
-Everything assumes a MacOSX environment.
+Everything assumes a MacOSX environment with [brew](https://brew.sh/), python, pip and [virtualenvwrapper](http://virtualenvwrapper.readthedocs.io/en/latest/index.html)
 
 ### Install mongo
 ```
@@ -58,9 +58,18 @@ MongoDB server version: 3.4.4
 25359
 > db.restaurants.find({borough: 'Bronx'}).count()
 2338
+```
+
+4. Create index:
+
+```
+> db.restaurants.createIndex( { cuisine: -1, borough: -1, zipcode: -1 } )
+> db.restaurants.createIndex( { name: "text" } )
 > exit
 ```
-4. Remove downloaded dataset:
+
+5. Remove downloaded dataset:
+
 ```
 $ rm primer-dataset.json
 ```
