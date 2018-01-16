@@ -1,78 +1,16 @@
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
 
+
 app = Flask(__name__, static_folder='client')
 client = MongoClient('localhost:27017')
 db = client.test
 API_ENDPOINT = '/api/v1'
 
+
 def _get_array_param(param):
     return filter(None, param.split(","))
 
-def _get_facet_borough_pipeline(cuisines, zipcodes):
-    match = {}
-
-    if cuisines:
-        match['cuisine'] = {'$in': cuisines}
-    if zipcodes:
-        match['address.zipcode'] = {'$in': zipcodes}
-
-    pipeline = [
-        {'$match': match}
-    ] if match else []
-
-    return pipeline + _get_group_pipeline('borough')
-
-def _get_facet_cuisine_pipeline(boroughs, zipcodes):
-    match = {}
-
-    if boroughs:
-        match['borough'] = {'$in': boroughs}
-    if zipcodes:
-        match['address.zipcode'] = {'$in': zipcodes}
-
-    pipeline = [
-        {'$match': match}
-    ] if match else []
-
-    return pipeline + _get_group_pipeline('cuisine')
-
-def _get_facet_zipcode_pipeline(boroughs, cuisines):
-    match = {}
-
-    if boroughs:
-        match['borough'] = {'$in': boroughs}
-    if cuisines:
-        match['cuisine'] = {'$in': cuisines}
-
-    pipeline = [
-        {'$match': match},
-    ] if match else []
-
-    return pipeline + _get_group_pipeline('address.zipcode')
-
-def _get_group_pipeline(group_by):
-    return [
-        {
-            '$group': {
-                '_id': '$' + group_by,
-                'count': {'$sum': 1},
-            }
-        },
-        {
-            '$project': {
-                '_id': 0,
-                'value': '$_id',
-                'count': 1,
-            }
-        },
-        {
-            '$sort': {'count': -1}
-        },
-        {
-            '$limit': 6,
-        }
-    ]
 
 # API
 @app.route(API_ENDPOINT + "/restaurants")
@@ -122,8 +60,9 @@ def restaurants():
     result['count'] = result['count'][0]['total'] if result['count'] else 0
     return jsonify(result)
 
+
 @app.route(API_ENDPOINT + "/restaurants/facets")
-def restaurants_and_facets():
+def restaurant_facets():
     # filters
     search = request.args.get('search', '')
     boroughs = _get_array_param(request.args.get('boroughs', ''))
@@ -146,10 +85,75 @@ def restaurants_and_facets():
 
     return jsonify(restaurant_facets)
 
-@app.route(API_ENDPOINT + "/restaurants/count")
-def restaurants_count():
-    restaurants_count = db.restaurants.find().count()
-    return jsonify(restaurants_count)
+
+def _get_facet_borough_pipeline(cuisines, zipcodes):
+    match = {}
+
+    if cuisines:
+        match['cuisine'] = {'$in': cuisines}
+    if zipcodes:
+        match['address.zipcode'] = {'$in': zipcodes}
+
+    pipeline = [
+        {'$match': match}
+    ] if match else []
+
+    return pipeline + _get_group_pipeline('borough')
+
+
+def _get_facet_cuisine_pipeline(boroughs, zipcodes):
+    match = {}
+
+    if boroughs:
+        match['borough'] = {'$in': boroughs}
+    if zipcodes:
+        match['address.zipcode'] = {'$in': zipcodes}
+
+    pipeline = [
+        {'$match': match}
+    ] if match else []
+
+    return pipeline + _get_group_pipeline('cuisine')
+
+
+def _get_facet_zipcode_pipeline(boroughs, cuisines):
+    match = {}
+
+    if boroughs:
+        match['borough'] = {'$in': boroughs}
+    if cuisines:
+        match['cuisine'] = {'$in': cuisines}
+
+    pipeline = [
+        {'$match': match},
+    ] if match else []
+
+    return pipeline + _get_group_pipeline('address.zipcode')
+
+
+def _get_group_pipeline(group_by):
+    return [
+        {
+            '$group': {
+                '_id': '$' + group_by,
+                'count': {'$sum': 1},
+            }
+        },
+        {
+            '$project': {
+                '_id': 0,
+                'value': '$_id',
+                'count': 1,
+            }
+        },
+        {
+            '$sort': {'count': -1}
+        },
+        {
+            '$limit': 6,
+        }
+    ]
+
 
 # Statics
 @app.route('/')
